@@ -61,3 +61,5 @@ http.route({
     return new Response("WebHook processed successfully", { status: 200 });
   }),
 });
+
+export default http;
