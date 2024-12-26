@@ -1,24 +1,23 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
 import { useCodeEditorStore } from "@/store/useCodeEditorStore";
-import { LANGUAGE_CONFIG } from "@/app/_constants";
+import { useEffect, useRef, useState } from "react";
+import { LANGUAGE_CONFIG } from "../_constants";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ChevronDownIcon, Lock, Sparkles } from "lucide-react";
+import useMounted from "@/hooks/useMounted";
 
-export const LanguageSelector = ({ hasAccess }: { hasAccess: boolean }) => {
+function LanguageSelector({ hasAccess }: { hasAccess: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const mounted = useMounted();
+
   const { language, setLanguage } = useCodeEditorStore();
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const currentLanguageObj = LANGUAGE_CONFIG[language];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -27,13 +26,14 @@ export const LanguageSelector = ({ hasAccess }: { hasAccess: boolean }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const handleLanguageSelect = (langId: string) => {
+    if (!hasAccess && langId !== "javascript") return;
+
+    setLanguage(langId);
+    setIsOpen(false);
+  };
 
   if (!mounted) return null;
-
-  const handleLanguageSelect = (langId: string) => {};
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -84,9 +84,7 @@ export const LanguageSelector = ({ hasAccess }: { hasAccess: boolean }) => {
            rounded-xl border border-[#313244] shadow-2xl py-2 z-50"
           >
             <div className="px-3 pb-2 mb-2 border-b border-gray-800/50">
-              <p className="text-xs font-medium text-gray-400">
-                Select Language
-              </p>
+              <p className="text-xs font-medium text-gray-400">Select Language</p>
             </div>
 
             <div className="max-h-[280px] overflow-y-auto overflow-x-hidden">
@@ -168,4 +166,5 @@ export const LanguageSelector = ({ hasAccess }: { hasAccess: boolean }) => {
       </AnimatePresence>
     </div>
   );
-};
+}
+export default LanguageSelector;

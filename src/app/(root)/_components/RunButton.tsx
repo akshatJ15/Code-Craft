@@ -1,29 +1,27 @@
 "use client";
-import { useUser } from "@clerk/nextjs";
+
 import { getExecutionResult, useCodeEditorStore } from "@/store/useCodeEditorStore";
+import { useUser } from "@clerk/nextjs";
+import { useMutation } from "convex/react";
 import { motion } from "framer-motion";
 import { Loader2, Play } from "lucide-react";
 import { api } from "../../../../convex/_generated/api";
-import { useMutation } from "convex/react";import { get } from "http";
-;
 
 function RunButton() {
   const { user } = useUser();
-  const { runCode, language, isRunning, executionResult } =
-    useCodeEditorStore();
-
-  const saveExecution = useMutation(api.codeExecutions.saveExecution);  
+  const { runCode, language, isRunning } = useCodeEditorStore();
+  const saveExecution = useMutation(api.codeExecutions.saveExecution);
 
   const handleRun = async () => {
     await runCode();
-    const result =getExecutionResult();
+    const result = getExecutionResult();
 
-    if(user && result) {
+    if (user && result) {
       await saveExecution({
         language,
+        code: result.code,
         output: result.output || undefined,
         error: result.error || undefined,
-        code: result.code,
       });
     }
   };
@@ -50,9 +48,7 @@ function RunButton() {
               <Loader2 className="w-4 h-4 animate-spin text-white/70" />
               <div className="absolute inset-0 blur animate-pulse" />
             </div>
-            <span className="text-sm font-medium text-white/90">
-              Executing...
-            </span>
+            <span className="text-sm font-medium text-white/90">Executing...</span>
           </>
         ) : (
           <>
@@ -68,5 +64,4 @@ function RunButton() {
     </motion.button>
   );
 }
-
 export default RunButton;

@@ -1,27 +1,24 @@
 "use client";
 
 import { useCodeEditorStore } from "@/store/useCodeEditorStore";
+import { AlertTriangle, CheckCircle, Clock, Copy, Terminal } from "lucide-react";
 import { useState } from "react";
-import {
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Copy,
-  Terminal,
-} from "lucide-react";
 import RunningCodeSkeleton from "./RunningCodeSkeleton";
 
-const OutputPanel = () => {
+function OutputPanel() {
   const { output, error, isRunning } = useCodeEditorStore();
   const [isCopied, setIsCopied] = useState(false);
 
-  const hasContent = output || error;
+  const hasContent = error || output;
+
   const handleCopy = async () => {
     if (!hasContent) return;
     await navigator.clipboard.writeText(error || output);
     setIsCopied(true);
+
     setTimeout(() => setIsCopied(false), 2000);
   };
+
   return (
     <div className="relative bg-[#181825] rounded-xl p-4 ring-1 ring-gray-800/50">
       {/* Header */}
@@ -67,9 +64,7 @@ const OutputPanel = () => {
               <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-1" />
               <div className="space-y-1">
                 <div className="font-medium">Execution Error</div>
-                <pre className="whitespace-pre-wrap text-red-400/80">
-                  {error}
-                </pre>
+                <pre className="whitespace-pre-wrap text-red-400/80">{error}</pre>
               </div>
             </div>
           ) : output ? (
@@ -85,15 +80,13 @@ const OutputPanel = () => {
               <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gray-800/50 ring-1 ring-gray-700/50 mb-4">
                 <Clock className="w-6 h-6" />
               </div>
-              <p className="text-center">
-                Run your code to see the output here...
-              </p>
+              <p className="text-center">Run your code to see the output here...</p>
             </div>
           )}
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default OutputPanel;
